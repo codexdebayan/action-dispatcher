@@ -1,0 +1,74 @@
+name: Demo Workflow with Inputs
+
+on:
+  workflow_dispatch:
+    inputs:
+      stackset:
+        description: "StackSet name"
+        required: true
+        type: string
+
+      cloud_type:
+        description: "Cloud type"
+        required: true
+        default: "comm"
+        type: choice
+        options:
+          - comm
+          - gov
+          - both
+
+      operation:
+        description: "Operation to perform"
+        required: true
+        default: "Delete"
+        type: choice
+        options:
+          - Create
+          - Update
+          - Delete
+      
+      ou:
+        description: "Organizational Units (space-separated)"
+        required: true
+        type: string
+
+jobs:
+  stackinstances-ops-job:
+    name: StackSet Operations Job
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Validate Inputs
+        run: |
+          echo "Validating inputs..."
+          if [ -z "${{ inputs.stackset }}" ]; then
+            echo "StackSet name cannot be empty"
+            exit 1
+          fi
+
+      - name: Print Inputs
+        run: |
+          echo "StackSet Name     : ${{ inputs.stackset }}"
+          echo "Cloud Type       : ${{ inputs.cloud_type }}"
+          echo "Operation        : ${{ inputs.operation }}"
+          echo "OUs              : ${{ inputs.ou }}"
+
+      - name: Handle Both Cloud Types
+        if: ${{ inputs.cloud_type == 'both' }}
+        run: echo "Both cloud types selected"
+
+      - name: Handle Commercial Cloud
+        if: ${{ inputs.cloud_type == 'comm' }}
+        run: echo "Commercial cloud selected"
+
+      - name: Handle Gov Cloud
+        if: ${{ inputs.cloud_type == 'gov' }}
+        run: echo "Government cloud selected"
+
+      - name: Parse OUs
+        run: |
+          echo "Processing OUs..."
+          for ou in ${{ inputs.ou }}; do
+            echo "OU: $ou"
+          done
