@@ -1,4 +1,4 @@
-name: Demo Workflow with Inputs
+name: Stackinstances-Ops
 
 on:
   workflow_dispatch:
