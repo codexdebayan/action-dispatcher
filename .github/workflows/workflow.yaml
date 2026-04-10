@@ -1,0 +1,51 @@
+name: Demo Workflow with Inputs
+
+on:
+  workflow_dispatch:
+    inputs:
+      username:
+        description: "Enter your name"
+        required: true
+        default: "guest"
+        type: string
+
+      run_tests:
+        description: "Run tests?"
+        required: true
+        default: false
+        type: boolean
+
+      environment:
+        description: "Select environment"
+        required: true
+        default: "dev"
+        type: choice
+        options:
+          - dev
+          - staging
+          - prod
+
+jobs:
+  demo-job:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Print Inputs
+        run: |
+          echo "Username: ${{ inputs.username }}"
+          echo "Run Tests: ${{ inputs.run_tests }}"
+          echo "Environment: ${{ inputs.environment }}"
+
+      - name: Conditional Step (Run Tests)
+        if: ${{ inputs.run_tests == true }}
+        run: echo "Running tests..."
+
+      - name: Environment Specific Step
+        run: |
+          if [ "${{ inputs.environment }}" == "prod" ]; then
+            echo "Deploying to PRODUCTION 🚀"
+          elif [ "${{ inputs.environment }}" == "staging" ]; then
+            echo "Deploying to STAGING ⚙️"
+          else
+            echo "Deploying to DEV 🧪"
+          fi
