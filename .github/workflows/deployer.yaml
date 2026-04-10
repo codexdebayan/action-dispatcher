@@ -1,0 +1,44 @@
+name: Deploy Configurator
+
+on:
+  workflow_dispatch:
+    inputs:
+      app_name:
+        description: "Application name"
+        required: true
+        default: "my-app"
+        type: string
+
+      replicas:
+        description: "Number of replicas"
+        required: true
+        default: 2
+        type: number
+
+      region:
+        description: "Deployment region"
+        required: true
+        default: "us-east-1"
+        type: choice
+        options:
+          - us-east-1
+          - eu-west-1
+          - ap-south-1
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Show Deployment Config
+        run: |
+          echo "🚀 Starting deployment..."
+          echo "App Name: ${{ inputs.app_name }}"
+          echo "Replicas: ${{ inputs.replicas }}"
+          echo "Region: ${{ inputs.region }}"
+
+      - name: Simulate Deployment
+        run: |
+          echo "Deploying ${{ inputs.app_name }} with ${{ inputs.replicas }} replicas to ${{ inputs.region }}"
+          sleep 5
+          echo "✅ Deployment completed!"
