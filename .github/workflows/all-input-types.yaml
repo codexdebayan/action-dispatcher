@@ -1,0 +1,79 @@
+name: Comprehensive Inputs Workflow
+
+on:
+  workflow_dispatch:
+    inputs:
+      # String Input
+      log_level:
+        description: 'Log level for the build'
+        required: true
+        default: 'info'
+        type: string
+        
+      # Choice Input
+      deploy_region:
+        description: 'Region to deploy to'
+        required: true
+        default: 'us-east-1'
+        type: choice
+        options:
+          - us-east-1
+          - us-west-2
+          - eu-central-1
+          - ap-south-1
+
+      # Boolean Input
+      run_integration_tests:
+        description: 'Run full integration test suite'
+        required: false
+        default: false
+        type: boolean
+
+      # Environment Input
+      target_env:
+        description: 'Environment to run against'
+        type: environment
+        required: true
+        
+      # Number (as string though sometimes number is supported by newer GHA, string is safest)
+      # Some runners parse types that aren't strictly one of the Big 4 as strings anyway, but let's stick to the official 
+      # valid ones: string, boolean, choice, environment. Wait, number is officially supported! Let's add it.
+      retry_count:
+        description: 'Number of times to retry on failure'
+        required: true
+        default: '3'
+        type: number
+        
+jobs:
+  print-all-inputs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print inputs nicely
+        run: |
+          echo "Log Level: ${{ inputs.log_level }}"
+          echo "Deploy Region: ${{ inputs.deploy_region }}"
+          echo "Run Integration Tests: ${{ inputs.run_integration_tests }}"
+          echo "Target Environment: ${{ inputs.target_env }}"
+          echo "Retry Count: ${{ inputs.retry_count }}"
+
+      - name: Demo Conditional Logic (Boolean)
+        if: ${{ inputs.run_integration_tests == true }}
+        run: echo "Executing the heavy integration tests..."
+
+      - name: Demo Regional Deployment (Choice)
+        run: |
+          case "${{ inputs.deploy_region }}" in
+            us-east-1|us-west-2)
+              echo "Deploying to US..."
+              ;;
+            eu-central-1)
+              echo "Deploying to EU..."
+              ;;
+            ap-south-1)
+              echo "Deploying to AP..."
+              ;;
+            *)
+              echo "Unknown region!"
+              exit 1
+              ;;
+          esac
